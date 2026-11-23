@@ -14,7 +14,7 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+app.use(express.json({ limit: '7mb' }));
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'campus-cercetare-backend' });
@@ -23,6 +23,16 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/resources', resourceRoutes);
 app.use('/api/bookings', bookingRoutes);
+
+app.use((err, req, res, next) => {
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'Cererea este prea mare. Dimensiunea maximă a imaginii este 5 MB.' });
+  }
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'Cererea conține date JSON invalide.' });
+  }
+  next(err);
+});
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, '0.0.0.0', () => {

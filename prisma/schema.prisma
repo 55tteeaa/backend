@@ -39,6 +39,8 @@ model Resource {
   requiresApproval Boolean   @default(false)
   maxHours         Int       @default(4)
   rules            String[]
+  imageData        Bytes?
+  imageMimeType    String?
   bookings         Booking[]
 }
 
@@ -47,7 +49,7 @@ model Booking {
   userId     String
   user       User          @relation(fields: [userId], references: [id])
   resourceId String
-  resource   Resource      @relation(fields: [resourceId], references: [id])
+  resource   Resource      @relation(fields: [resourceId], references: [id], onDelete: Cascade)
   date       String
   startHour  Int
   endHour    Int
